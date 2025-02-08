@@ -1,0 +1,45 @@
+---@class Identifiers
+---@field [string] string
+---@field ip string
+---@field xbl string
+---@field live string
+---@field fivem string
+---@field steam string
+---@field discord string
+---@field license string
+---@field license2 string
+
+---@class Player
+---@field id number
+---@field name string
+---@field ped integer
+---@field coords vector3
+---@field health number
+---@field armor number
+---@field ping number
+---@field identifiers Identifiers
+---@field steamProfile string
+---@field nearby? {players: Player[], count: number, admins: number}
+
+---@class ReportData
+---@field id string
+---@field sender Player
+---@field status "pending"|"claimed"|"closed"
+---@field created_on integer
+---@field claimed_on integer
+---@field closed_on integer
+
+---@class Report
+---@field data ReportData
+---@field getSender fun(): Player
+---@field getStatus fun(): "pending"|"claimed"|"closed"
+---@field getCreatedTime fun(): integer
+---@field getClaimedTime fun(): integer
+---@field getClosedTime fun(): integer
+---@field isActive fun(): boolean
+---@field update fun(data: ReportData): Report
+---@field isActive fun(): boolean
+---@field claim fun(): Report
+---@field unclaim fun(): Report
+---@field close fun(): Report
+---@field reopen fun(): Report
