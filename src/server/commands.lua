@@ -43,19 +43,10 @@ QBCore.Commands.Add(
     true,
     function(src, args)
         local select = {}
-
         for i = 1, #Config.catagories do
             table.insert(select, { value = i, label = Config.catagories[i] })
         end
-
-        QBCore.Debug(args)
-
-        TriggerClientEvent(
-            "report:fill",
-            src,
-            select,
-            table.concat(args, " ")
-        )
+        TriggerClientEvent("report:fill", src, select, table.concat(args, " "))
     end,
     "user"
 )

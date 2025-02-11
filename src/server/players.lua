@@ -64,10 +64,8 @@ function Server.players.all(details)
     end
 
     function obj.filterByDistance(src, coords, range)
-        print(src, coords, range)
         return obj.filter(function(player)
             if player.id == src then return false end
-            print(player.coords, coords, range)
             return math.in_range(player.coords, coords, range)
         end)
     end
