@@ -11,9 +11,10 @@
 
 ---@class Player
 ---@field id number
----@field name string
 ---@field ped integer
+---@field name string
 ---@field coords vector3
+---@field citizenid string
 ---@field health number
 ---@field armor number
 ---@field ping number
@@ -25,19 +26,34 @@
 ---@field id string
 ---@field sender Player
 ---@field status "pending"|"claimed"|"closed"
----@field created_on integer
----@field claimed_on integer
----@field closed_on integer
+---@field title string
+---@field catagory number
+---@field description string
+---@field notes string[]
+---@field created_on string|osdate
+---@field claimed_on string|osdate
+---@field closed_on string|osdate
 
 ---@class Report
 ---@field data ReportData
+---@field getId fun(): string
 ---@field getSender fun(): Player
 ---@field getStatus fun(): "pending"|"claimed"|"closed"
----@field getCreatedTime fun(): integer
----@field getClaimedTime fun(): integer
----@field getClosedTime fun(): integer
+---@field getTitle fun(): string
+---@field getCatagory fun(): number
+---@field getCatagoryName fun(): string
+---@field getDescription fun(): string
+---@field getNotes fun(): string[]
+---@field getCreatedTime fun(): string
+---@field getClaimedTime fun(): string
+---@field getClosedTime fun(): string
 ---@field isActive fun(): boolean
 ---@field update fun(data: ReportData): Report
+---@field setTitle fun(title: string): Report
+---@field setCatagory fun(catagory: number): Report
+---@field setDescription fun(description: string[]): Report
+---@field addNote fun(note: string): Report
+---@field removeNote fun(index: number): Report
 ---@field isActive fun(): boolean
 ---@field claim fun(): Report
 ---@field unclaim fun(): Report

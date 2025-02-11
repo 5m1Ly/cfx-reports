@@ -15,7 +15,7 @@ end
 ---@param y vector
 ---@return integer
 function math.distance(x, y)
-    return #(x - y)
+    return #(vector3(x.x or 0.0, x.y or 0.0, x.z or 0.0) - vector3(y.x or 0.0, y.y or 0.0, y.z or 0.0))
 end
 
 ---calculates if a given vector is in range of another vector
@@ -34,13 +34,13 @@ end
 ---@param delimiter? string | " "
 ---@param unpack? boolean
 ---@return string|string[]
-function string.split(input, delimiter, unpack)
+function string.split(input, delimiter)
     local matcher = ("([^%s]+)"):format(delimiter or " ")
     local output = {}
     for value in string.gmatch(input, matcher) do
         table.insert(output, value)
     end
-    return not unpack and output or table.unpack(output)
+    return output
 end
 
 ---generate a random uuid

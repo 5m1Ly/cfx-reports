@@ -7,8 +7,8 @@ local function getPlayerIdentifiers(netid)
     local raw = GetPlayerIdentifiers(netid)
     local identifiers = {}
     for i = 1, #raw do
-        local id = raw[i]
-        local type, value = string.split(id, ":", true)
+        local id = string.split(raw[i], ":")
+        local type, value = id[1], id[2]
         identifiers[type] = value
     end
     return identifiers
@@ -18,6 +18,7 @@ end
 ---@param steamid string
 ---@return string
 local function steamProfileId(steamid)
+    if steamid == nil then return "" end
     return ("%s"):format(tostring(tonumber(steamid, 16)))
 end
 
@@ -37,7 +38,8 @@ function Server.players.all(details)
     obj.count = #netids
 
     for i = 1, obj.count do
-        obj.store[i] = Server.players.single(obj.store[i], details)
+        local netid = netids[i]
+        obj.store[i] = Server.players.single(netid, details)
     end
 
     function obj.map(callback)
@@ -48,6 +50,9 @@ function Server.players.all(details)
         return output
     end
 
+    ---comment
+    ---@param callback fun(player: Player): boolean
+    ---@return table
     function obj.filter(callback)
         local output = {}
         for i = 1, #obj.store do
@@ -59,10 +64,27 @@ function Server.players.all(details)
     end
 
     function obj.filterByDistance(coords, range)
-        local function filter(player)
-            return math.in_range(GetEntityCoords(GetPlayerPed(player)), coords, range)
+        return obj.filter(function(player)
+            return math.in_range(player.coords, coords, range)
+        end)
+    end
+
+    function obj.filterOperators()
+        return obj.filter(function(player)
+            return QBCore.Functions.HasPermission(player, "mod")
+        end)
+    end
+
+    function obj.filterNearbyOperators(coords, range)
+        local retval = {}
+        local nearby = obj.filterByDistance(coords, range)
+        for i = 1, #nearby do
+            local player = nearby[i]
+            if QBCore.Functions.HasPermission(player, "mod") then
+                table.insert(retval, player)
+            end
         end
-        return obj.filter(filter)
+        return retval
     end
 
     return obj
@@ -74,14 +96,14 @@ end
 function Server.players.single(netid, nearby)
     local obj = {}
 
-    obj.id = netid
-    obj.name = GetPlayerName(netid)
-    obj.ped = GetPlayerPed(netid)
+    obj.id = type(netid) == "number" and netid or tonumber(netid)
+    obj.name = GetPlayerName(obj.id)
+    obj.ped = GetPlayerPed(obj.id)
     obj.coords = GetEntityCoords(obj.ped)
     obj.health = GetEntityHealth(obj.ped)
     obj.armor = GetPedArmour(obj.ped)
     obj.ping = GetPlayerPing(netid)
-    obj.identifiers = getPlayerIdentifiers(netid)
+    obj.identifiers = getPlayerIdentifiers(obj.id)
     obj.steamProfile = steamProfileUrl(obj.identifiers.steam)
 
     if type(nearby) == "boolean" and not nearby then return obj end
@@ -89,9 +111,7 @@ function Server.players.single(netid, nearby)
     obj.nearby = {}
     obj.nearby.players = Server.players.all(false).filterByDistance(obj.coords, 100)
     obj.nearby.count = #obj.nearby.players
-    obj.nearby.admins = Server.players.all(false).filter(function(player)
-        return IsPlayerAceAllowed(player, "hp-reports.view")
-    end)
+    obj.nearby.admins = Server.players.all(false).filterNearbyOperators(obj.coords, 100)
 
     return obj
 end

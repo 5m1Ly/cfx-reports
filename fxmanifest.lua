@@ -7,10 +7,7 @@ version "0.0.1"
 
 lua54 'yes'
 
-shared_scripts {
-    '@ox_lib/init.lua',
-    'config/config.pub.lua',
-}
+shared_script '@ox_lib/init.lua'
 
 server_scripts {
     "@oxmysql/lib/MySQL.lua",
@@ -19,12 +16,11 @@ server_scripts {
     "src/server/utils.lua",
     "src/server/players.lua",
     "src/server/reports.lua",
+    "src/server/discord.lua",
     "src/server/commands.lua",
 }
 
-client_scripts {
-    "src/client/main.lua"
-}
+client_script "src/client/main.lua"
 
 dependencies {
     "qb-core",

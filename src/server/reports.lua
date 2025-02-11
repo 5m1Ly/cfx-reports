@@ -3,15 +3,19 @@ local reports = {}
 reports.store = {}
 reports.active = 0
 
-function Server.reports.create(src)
+function Server.reports.create(src, title, catagory, description)
     ---@type ReportData
     local report = {
         id = string.uuid(),
         sender = Server.players.single(src),
         status = "pending",
-        created_on = os.time(),
-        claimed_on = 0,
-        closed_on = 0
+        title = title,
+        catagory = catagory,
+        description = description,
+        notes = {},
+        created_on = os.date('!%Y-%m-%dT%H:%M:%S.000Z'),
+        claimed_on = "",
+        closed_on = ""
     }
     reports.store[report.id] = report
     reports.active += 1
@@ -25,12 +29,36 @@ function Server.reports.single(id)
     local obj = { data = reports.store[id] }
 
     -- getters
+    function obj.getId()
+        return id
+    end
+
     function obj.getSender()
         return obj.data.sender
     end
 
     function obj.getStatus()
         return obj.data.status
+    end
+
+    function obj.getTitle()
+        return obj.data.title
+    end
+
+    function obj.getCatagory()
+        return obj.data.catagory
+    end
+
+    function obj.getCatagoryName()
+        return Config.catagories[obj.data.catagory]
+    end
+
+    function obj.getDescription()
+        return obj.data.description
+    end
+
+    function obj.getNotes()
+        return obj.data.notes
     end
 
     function obj.getCreatedTime()
@@ -55,6 +83,30 @@ function Server.reports.single(id)
             obj.data[key] = value
         end
         reports.store[id] = obj.data
+        return obj
+    end
+
+    function obj.setTitle(title)
+        return obj.update({ title = title })
+    end
+
+    function obj.setCatagory(catagory)
+        return obj.update({ catagory = catagory })
+    end
+
+    function obj.setDescription(description)
+        return obj.update({ description = description })
+    end
+
+    function obj.addNotes(note)
+        table.insert(obj.data.notes, note)
+        obj.update({ notes = obj.getNotes() })
+        return obj
+    end
+
+    function obj.removeNotes(index)
+        table.remove(obj.data.notes, index)
+        obj.update({ notes = obj.getNotes() })
         return obj
     end
 
@@ -117,25 +169,25 @@ function Server.reports.allReports()
 end
 
 function Server.reports.activeReports()
-    return reports.filter(function(report)
+    return Server.reports.filter(function(report)
         return report.isActive()
     end)
 end
 
 function Server.reports.pendingReports()
-    return reports.filter(function(report)
+    return Server.reports.filter(function(report)
         return report.data.status == "pending"
     end)
 end
 
 function Server.reports.claimedReports()
-    return reports.filter(function(report)
+    return Server.reports.filter(function(report)
         return report.data.status == "claimed"
     end)
 end
 
 function Server.reports.closedReports()
-    return reports.filter(function(report)
+    return Server.reports.filter(function(report)
         return report.data.status == "closed"
     end)
 end
