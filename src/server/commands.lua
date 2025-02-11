@@ -14,7 +14,7 @@ RegisterNetEvent("report:send", function(title, catagory, reason)
 
     local players = Server.players.all(false)
     local opcount = #players.filterOperators()
-    local opnearby = #players.filterNearbyOperators(sender.coords, 100)
+    local opnearby = #players.filterNearbyOperators(src, sender.coords, 100)
 
     local activeReports = Server.reports.activeReports()
 

@@ -8,13 +8,14 @@ function Server.discord.tags(catagoryName)
     for i = 1, #tags do
         local role = tags[i]
         if i > 1 then str = str .. ", " end
-        str = str .. ("<@%d>"):format(Config.discord.roles[role])
+        str = str .. ("<@&%s>"):format(Config.discord.roles[role])
     end
     return str
 end
 
----comment
+---get the discord message object
 ---@param report Report
+---@return string
 function Server.discord.message(report)
     local title = report.getTitle()
     local catagory = report.getCatagoryName()
@@ -38,7 +39,7 @@ function Server.discord.message(report)
         tostring(sender.armor),
         tostring(sender.ping),
         tostring(sender.nearby.count),
-        tostring(sender.nearby.admins)
+        tostring(#sender.nearby.admins)
     )
 
     -- add timestamp
@@ -64,25 +65,15 @@ function Server.discord.message(report)
     msg.embeds[2].fields[2].value = msg.embeds[2].fields[2].value:format(catagory)
     msg.embeds[2].fields[3].value = msg.embeds[2].fields[3].value:format(description)
 
-    return msg
+    return json.encode(msg)
 end
 
 function Server.discord.send(report)
-    local req = {
-        uri = Config.discord.webhook,
-        method = 'POST',
-        data = json.encode(Server.discord.message(report)),
-        headers = { ['Content-Type'] = 'application/json' }
-    }
-    PerformHttpRequest(req.uri, function(err, text, headers)
-        if err > 0 then
-            print(("Discord Error: %s"):format(err))
-        end
-        if text then
-            print(("Discord Response: %s"):format(text))
-        end
-        if headers then
-            print(("Discord Headers: %s"):format(json.encode(headers)))
-        end
-    end, req.method, req.data, req.headers)
+    PerformHttpRequest(Config.discord.webhook, function(status, body, headers, errorData)
+        print("discord response")
+        if status > 0 then print(("status: %s"):format(status)) end
+        if body then print(("body: %s"):format(body)) end
+        if headers then print(("headers: %s"):format(json.encode(headers))) end
+        if errorData then print(("error data: %s"):format(json.encode(errorData))) end
+    end, 'POST', Server.discord.message(report), { ['Content-Type'] = 'application/json' })
 end

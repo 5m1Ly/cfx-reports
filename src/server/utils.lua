@@ -32,7 +32,6 @@ end
 ---split string based on delimiter and return a table with the seperated strings. when there is no delimiter given it wil use a space as delimiter
 ---@param input string
 ---@param delimiter? string | " "
----@param unpack? boolean
 ---@return string|string[]
 function string.split(input, delimiter)
     local matcher = ("([^%s]+)"):format(delimiter or " ")
