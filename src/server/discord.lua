@@ -24,7 +24,7 @@ function Server.discord.message(report)
 
     local sender = report.getSender()
 
-    local msg = Config.discord.message
+    local msg = Config.discord.message()
 
     -- add the roles related to the report catagory
     local tags = Server.discord.tags(catagory)
